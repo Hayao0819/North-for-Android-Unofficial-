@@ -328,7 +328,10 @@ private fun AccountCandidate(user: User, loader: ImageLoader, onOpen: () -> Unit
                 Text(user.name, color = c.text, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 UserBadges(user, compact = true)
             }
-            Text("@${user.handle}", color = c.textMuted, fontSize = 13.sp, maxLines = 1)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("@${user.handle}", color = c.textMuted, fontSize = 13.sp, maxLines = 1)
+                if (user.followedBy) FollowedByBadge()
+            }
         }
     }
 }

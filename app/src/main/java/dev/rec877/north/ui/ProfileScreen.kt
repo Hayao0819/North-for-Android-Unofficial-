@@ -421,11 +421,7 @@ private fun ProfileHeader(
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("@${user.handle}", color = c.textMuted, fontSize = 15.sp)
-                if (user.followedBy) {
-                    Box(Modifier.clip(CircleShape).background(c.elev3).padding(horizontal = 8.dp, vertical = 2.dp)) {
-                        Text("フォローされています", color = c.textMuted, fontSize = 12.sp)
-                    }
-                }
+                if (user.followedBy) FollowedByBadge()
             }
 
             if (!user.bio.isNullOrBlank()) {

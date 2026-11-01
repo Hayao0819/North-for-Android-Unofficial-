@@ -93,7 +93,10 @@ fun UserListScreen(vm: MainViewModel, loader: ImageLoader, handle: String, kind:
                                 Text(user.name, color = c.text, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 UserBadges(user)
                             }
-                            Text("@${user.handle}", color = c.textMuted, fontSize = 14.sp)
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text("@${user.handle}", color = c.textMuted, fontSize = 14.sp)
+                                if (user.followedBy) FollowedByBadge()
+                            }
                             user.bio?.takeIf(String::isNotBlank)?.let { Text(it, color = c.text, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
                         }
                     }

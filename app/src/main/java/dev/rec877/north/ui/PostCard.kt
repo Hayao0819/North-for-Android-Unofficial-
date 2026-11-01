@@ -523,6 +523,15 @@ fun PollCard(poll: Poll) {
     }
 }
 
+/** 相手が自分をフォローしているときに、ユーザー名の横へ出す小さなラベル。 */
+@Composable
+fun FollowedByBadge() {
+    val c = North.colors
+    Box(Modifier.clip(CircleShape).background(c.elev3).padding(horizontal = 8.dp, vertical = 2.dp)) {
+        Text("フォローされています", color = c.textMuted, fontSize = 12.sp)
+    }
+}
+
 /** 認証済み・非公開アカウントであることを、プロフィール以外の投稿一覧でも明示する。 */
 @Composable
 fun UserBadges(user: User, compact: Boolean = true) {
