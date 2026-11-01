@@ -112,10 +112,17 @@ fun AppShell(vm: MainViewModel, loader: ImageLoader) {
 
     val stack = vm.backStack
     val top = stack.lastOrNull()
+    val scope = rememberCoroutineScope()
+
+    // スクロール位置はここで持つ（タブを切り替えても戻ってきたとき保たれる）。
+    val homeListState = rememberLazyListState()
 
     fun selectTab(i: Int) {
         // 詳細画面を見ている最中でも、ホームを押せば戻る操作なしでTLへ復帰する。
-        if (i == 0) { vm.popToRoot(); tab = 0; return }
+        if (i == 0) {
+            if (tab == 0 && top == null) scope.launch { homeListState.animateScrollToItem(0) }
+            vm.popToRoot(); tab = 0; return
+        }
         if (i == tab) return
         if (inlineDraftText.isNotBlank() || inlineDraftImages.isNotEmpty()) pendingTab = i
         else { vm.popToRoot(); tab = i }
@@ -132,9 +139,7 @@ fun AppShell(vm: MainViewModel, loader: ImageLoader) {
         }
     }
 
-    // スクロール位置はここで持つ（タブを切り替えても戻ってきたとき保たれる）。
     // 検索結果は「語句 + タブ」が変わるたびに新しい状態にして、必ず先頭から表示する。
-    val homeListState = rememberLazyListState()
     val notifListState = rememberLazyListState()
     val searchListState = rememberSaveable(
         vm.search.query, vm.search.tab, vm.search.version, saver = LazyListState.Saver
@@ -364,7 +369,7 @@ fun AppShell(vm: MainViewModel, loader: ImageLoader) {
 
     if (notificationIntro) AlertDialog(
         onDismissRequest = { notificationIntro = false }, containerColor = c.elev1,
-        icon = { androidx.compose.foundation.Image(painterResource(R.drawable.north_icon), contentDescription = "north", modifier = Modifier.fillMaxWidth().height(56.dp)) },
+        icon = { androidx.compose.foundation.Image(painterResource(R.drawable.north_icon), contentDescription = "north", modifier = Modifier.fillMaxWidth().height(56.dp), colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(c.text)) },
         title = { Text("通知を許可しますか？", color = c.text, fontWeight = FontWeight.ExtraBold) },
         text = { Text("返信・いいね・フォローなどの新着をお知らせします。後から設定で変更できます。", color = c.textMuted) },
         confirmButton = { TextButton(onClick = { notificationIntro = false; permLauncher.launch(Manifest.permission.POST_NOTIFICATIONS) }) { Text("許可する", color = c.accent) } },
