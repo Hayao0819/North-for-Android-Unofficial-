@@ -1,6 +1,10 @@
 package dev.rec877.north.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,7 +51,9 @@ fun ListsScreen(vm: MainViewModel) {
         else {
             val all = (lists.items + lists.followed).distinctBy { it.id }
             if (all.isEmpty()) Text("リストはまだありません", color = c.textMuted, modifier = Modifier.padding(24.dp))
-            all.forEach { list -> ListRow(list, vm) { load() } }
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                all.forEach { list -> ListRow(list, vm) { load() } }
+            }
         }
     }
     if (creating) CreateListDialog(vm, onDismiss = { creating = false }) { creating = false; load() }
@@ -62,6 +68,24 @@ fun ListsScreen(vm: MainViewModel) {
 }
 
 @Composable private fun CreateListDialog(vm: MainViewModel, onDismiss: () -> Unit, onDone: () -> Unit) {
+    val c = North.colors
     var name by remember { mutableStateOf("") }
-    androidx.compose.material3.AlertDialog(onDismissRequest = onDismiss, title = { Text("リストを作成") }, text = { androidx.compose.foundation.text.BasicTextField(name, { name = it }, modifier = Modifier.fillMaxWidth()) }, confirmButton = { TextButton(onClick = { if (name.isNotBlank()) vm.launchSafely { vm.api.createList(name, null, false); onDone() } }) { Text("作成") } }, dismissButton = { TextButton(onClick = onDismiss) { Text("キャンセル") } })
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = c.elev1,
+        title = { Text("リストを作成", color = c.text, fontWeight = FontWeight.ExtraBold) },
+        text = {
+            androidx.compose.foundation.text.BasicTextField(
+                value = name,
+                onValueChange = { name = it },
+                singleLine = true,
+                textStyle = TextStyle(color = c.text, fontSize = 16.sp),
+                cursorBrush = SolidColor(c.accent),
+                modifier = Modifier.fillMaxWidth().background(c.elev2, androidx.compose.foundation.shape.RoundedCornerShape(10.dp)).padding(12.dp),
+                decorationBox = { inner -> Box { if (name.isEmpty()) Text("リスト名", color = c.textMuted, fontSize = 16.sp); inner() } },
+            )
+        },
+        confirmButton = { TextButton(onClick = { if (name.isNotBlank()) vm.launchSafely { vm.api.createList(name, null, false); onDone() } }) { Text("作成", color = c.accent) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("キャンセル", color = c.textMuted) } },
+    )
 }
