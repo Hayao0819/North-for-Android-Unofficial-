@@ -2,12 +2,14 @@ package dev.rec877.north.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 
@@ -31,6 +33,8 @@ class NorthColors(
     val post: Color,
     val textOnPost: Color,
     val danger: Color,
+    /** 明るい背景のテーマか。システムバーのアイコン色と Material の配色の切替に使う。 */
+    val light: Boolean = false,
 )
 
 /** サイトの設定: テーマ=midnight / アクセント=yellow */
@@ -70,12 +74,13 @@ fun northColors(themeId: String = "midnight", accent: Color = Color(0xFFFFD400))
     textMuted = if (light) Color(0xFF52616B) else Color(0xFF9AA0C9),
     textFaint = if (light) Color(0xFF73818B) else Color(0xFF747BA8),
     accent = accent,
-    textOnAccent = Color(0xFF0F1419),
+    textOnAccent = if (accent.luminance() > 0.4f) Color(0xFF0F1419) else Color.White,
     like = Color(0xFFF91880),
     repost = Color(0xFF00BA7C),
     post = if (light) Color(0xFF17212B) else Color(0xFFFFFFFF),
     textOnPost = if (light) Color.White else Color(0xFF040512),
     danger = Color(0xFFF4212E),
+    light = light,
     )
 }
 
@@ -94,7 +99,7 @@ object North {
 @Composable
 fun NorthTheme(colors: NorthColors = MidnightYellow, fontScale: Float = 1f, content: @Composable () -> Unit) {
     val currentDensity = LocalDensity.current
-    val scheme = darkColorScheme(
+    val scheme = (if (colors.light) lightColorScheme() else darkColorScheme()).copy(
         primary = colors.accent,
         onPrimary = colors.textOnAccent,
         background = colors.bg,

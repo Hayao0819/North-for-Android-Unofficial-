@@ -7,6 +7,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import coil3.ImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
@@ -20,11 +21,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // アプリは常にダークなので、ステータス/ナビゲーションバーのアイコンは明るい色に固定
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-        )
+        applySystemBars(light = vm.themeColors.light)
         // 画面回転などの再生成では、同じ宛先を二重処理しない
         if (savedInstanceState == null) {
             handleRedirect(intent)
@@ -32,6 +29,8 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+            // 明るいテーマへ切り替えたら、ステータス/ナビゲーションバーのアイコンも暗い色にする
+            LaunchedEffect(vm.themeColors.light) { applySystemBars(light = vm.themeColors.light) }
             NorthTheme(colors = vm.themeColors, fontScale = vm.fontScale) {
                 // Bearer付きのOkHttpで画像を取得するローダー
                 val loader = remember {
@@ -73,6 +72,12 @@ class MainActivity : ComponentActivity() {
             UpdateInstaller.Action.INSTALLER_OPENED -> installPermissionScreenOpened = false
             UpdateInstaller.Action.NONE -> Unit
         }
+    }
+
+    private fun applySystemBars(light: Boolean) {
+        val transparent = android.graphics.Color.TRANSPARENT
+        val style = if (light) SystemBarStyle.light(transparent, transparent) else SystemBarStyle.dark(transparent)
+        enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
     }
 
     private fun handleRedirect(i: Intent?) {
