@@ -38,6 +38,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -73,6 +74,13 @@ import kotlinx.coroutines.withContext
 private const val MAX_MEDIA_ITEMS = 4
 private const val MAX_WEIGHT = 280
 
+/** 選んだ画像のURIを、LazyColumn の item が画面外で破棄されても残すための Saver。 */
+private val uriListSaver = listSaver<List<Uri>, String>(
+    save = { uris -> uris.map(Uri::toString) },
+    restore = { saved -> saved.map(Uri::parse) },
+)
+private val stringListSaver = listSaver<List<String>, String>(save = { it }, restore = { it })
+
 /**
  * サイトの .composer を再現。下段にメディア追加ボタンと「ポストする」(白ピル)。
  * 画像・動画はAndroidのフォトピッカー（権限不要）で合計最大4件。送信時にアップロードしてから投稿する。
@@ -95,8 +103,8 @@ fun Composer(
 ) {
     val c = North.colors
     var text by rememberSaveable { mutableStateOf("") }
-    var images by remember { mutableStateOf<List<Uri>>(emptyList()) }
-    var restoredMediaIds by remember { mutableStateOf<List<String>>(emptyList()) }
+    var images by rememberSaveable(stateSaver = uriListSaver) { mutableStateOf<List<Uri>>(emptyList()) }
+    var restoredMediaIds by rememberSaveable(stateSaver = stringListSaver) { mutableStateOf<List<String>>(emptyList()) }
     var draftPickerOpen by remember { mutableStateOf(false) }
     var directPostApproved by rememberSaveable(text) { mutableStateOf(false) }
 
