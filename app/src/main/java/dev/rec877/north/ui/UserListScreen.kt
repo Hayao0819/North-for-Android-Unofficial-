@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,6 +64,7 @@ class UserListController(vm: MainViewModel, handle: String, kind: String) : Scre
     override fun onReplyPosted() = Unit
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UserListScreen(vm: MainViewModel, loader: ImageLoader, handle: String, kind: String) {
     val c = North.colors
@@ -93,7 +96,8 @@ fun UserListScreen(vm: MainViewModel, loader: ImageLoader, handle: String, kind:
                                 Text(user.name, color = c.text, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 UserBadges(user)
                             }
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            // 長いユーザー名でもラベルを折り返さず、入らなければ次の行へ送る。
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text("@${user.handle}", color = c.textMuted, fontSize = 14.sp)
                                 if (user.followedBy) FollowedByBadge()
                             }

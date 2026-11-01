@@ -528,7 +528,7 @@ fun PollCard(poll: Poll) {
 fun FollowedByBadge() {
     val c = North.colors
     Box(Modifier.clip(CircleShape).background(c.elev3).padding(horizontal = 8.dp, vertical = 2.dp)) {
-        Text("フォローされています", color = c.textMuted, fontSize = 12.sp)
+        Text("フォローされています", color = c.textMuted, fontSize = 12.sp, maxLines = 1)
     }
 }
 
